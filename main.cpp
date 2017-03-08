@@ -1,3 +1,4 @@
+#include <iostream>
 #include <igl/avg_edge_length.h>
 #include <igl/per_vertex_normals.h>
 #include <igl/per_face_normals.h>
@@ -7,6 +8,7 @@
 #include <igl/viewer/ViewerPlugin.h>
 #include <igl/jet.h>
 #include <igl/barycenter.h>
+#include <igl/unproject_onto_mesh.h>
 
 #include <nanogui/formhelper.h>
 #include <nanogui/screen.h>
@@ -14,13 +16,11 @@
 #include <nanogui/slider.h>
 #include <nanogui/progressbar.h>
 #include <nanogui/toolbutton.h>
-
-#include <iostream>
-#include "qJet.h"
-
+#include <GLFW/glfw3.h>
 #include <tinyxml2.h>
 
-#include <GLFW/glfw3.h>
+#include "qJet.h"
+#include "interactiveSelection.h"
 
 // Mesh
 Eigen::MatrixXd V;
@@ -49,8 +49,39 @@ namespace meshProcessing {
 		for (auto i = 0; i < V.rows(); ++i) {
 			V.row(i) -= center;
 		}
-
 	}
+
+}
+
+bool mouse_down(igl::viewer::Viewer& viewer, int button, int modifier) {
+	int fid;
+	Eigen::Vector3f bc;
+	Eigen::MatrixXd C;
+	C = Eigen::MatrixXd::Constant(F.rows(), 3, 1);
+	// Cast a ray in the view direction starting from the mouse position
+	double x = viewer.current_mouse_x;
+	double y = viewer.core.viewport(3) - viewer.current_mouse_y;
+	if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core.view * viewer.core.model,
+		viewer.core.proj, viewer.core.viewport, viewer.data.V, viewer.data.F, fid, bc))
+	{
+		C.row(fid) << 1, 0, 0;
+		viewer.data.set_colors(C);
+		
+		return true;
+		std::vector<int> selectionFaces;
+		intRobo::part_selection(fid, viewer.data.V, viewer.data.F, selectionFaces);
+
+		const Eigen::RowVector3d color(0.9, 0.85, 0);
+		Eigen::MatrixXd C = color.replicate(viewer.data.V.rows(), 1);
+		C.resize(viewer.data.V.rows(), 3);
+
+		for (auto& curF : selectionFaces) {
+			C.row(curF) = Eigen::RowVector3d(0.9, 0, 0);
+		}
+		viewer.data.set_colors(C);
+		return true;
+	}
+	return false;
 }
 
 // It allows to change the degree of the field when a number is pressed
@@ -104,16 +135,12 @@ void someOpt(igl::viewer::Viewer &viewer) {
 	return;
 }
 
+
+
 int main(int argc, char *argv[])
 {
 	using namespace std;
 	using namespace Eigen;
-
-	cout <<
-		"Press 1 to turn off Ambient Occlusion" << endl <<
-		"Press 2 to turn on Ambient Occlusion" << endl <<
-		"Press . to turn up lighting" << endl <<
-		"Press , to turn down lighting" << endl;
 
 	// load external setting file
 	tinyxml2::XMLDocument doc;
@@ -169,6 +196,17 @@ int main(int argc, char *argv[])
 		textBox->setUnits("%");
 
 		viewer.ngui->addButton("Run Algorithm", [&]() {
+			std::vector<int> selectionFaces;
+			intRobo::part_selection(0, viewer.data.V, viewer.data.F, selectionFaces);
+			
+			const Eigen::RowVector3d color(0.9, 0.85, 0);
+			Eigen::MatrixXd C = color.replicate(viewer.data.V.rows(), 1);
+			C.resize(viewer.data.V.rows(), 3);
+
+			for (auto& curF : selectionFaces) {
+				C.row(curF) = Eigen::RowVector3d(0.9, 0, 0);
+			}
+			viewer.data.set_colors(C);
 		});
 
 		
@@ -278,7 +316,32 @@ int main(int argc, char *argv[])
 			atoi(doc.FirstChildElement("Window-size")->FirstChildElement("Height")->FirstChild()->Value()));
 		return false;
 	};
+	
+	viewer.callback_mouse_down =
+		[&](igl::viewer::Viewer& viewer, int, int)->bool
+	{
+		int fid;
+		Eigen::Vector3f bc;
+		// Cast a ray in the view direction starting from the mouse position
+		double x = viewer.current_mouse_x;
+		double y = viewer.core.viewport(3) - viewer.current_mouse_y;
+		if (igl::unproject_onto_mesh(Eigen::Vector2f(x, y), viewer.core.view * viewer.core.model,
+			viewer.core.proj, viewer.core.viewport, viewer.data.V, viewer.data.F, fid, bc))
+		{
+			std::vector<int> selectionFaces;
+			intRobo::part_selection(viewer.data.F.row(fid).x(), viewer.data.V, viewer.data.F, selectionFaces);
 
+			const Eigen::RowVector3d color(0.9, 0.85, 0);
+			Eigen::MatrixXd C = color.replicate(viewer.data.V.rows(), 1);
+			for (auto& f : selectionFaces) {
+				C.row(f) << 0, 1, 0;
+			}
+			C.row(viewer.data.F.row(fid).x()) << 0, 1, 0;
+			viewer.data.set_colors(C);
+			return true;
+		}
+		return false;
+	};
 	//viewer.callback_key_down = &key_down;
 	//key_down(viewer, '2', 0);
 	viewer.core.background_color = Eigen::Vector4f(0.42f, 0.43f, 1.0f, 1.0f);

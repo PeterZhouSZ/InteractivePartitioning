@@ -270,10 +270,12 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="interactiveSelection.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="qJet.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="interactiveSelection.h" />
     <ClInclude Include="qJet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
