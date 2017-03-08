@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<Window-title>Interactive Mesh Partitioning for Fabrication (Ver. 0.1)</Window-title>
+
+<Window-size>
+	<Width>1400</Width>
+	<Height>800</Height>
+</Window-size>
+
+<Weights>
+	<Value>0.6</Value>
+	<Value>0.3</Value>
+	<Value>0.2</Value>
+	<Value>0.1</Value>
+	<Value>0.4</Value>
+	<Value>0.25</Value>
+</Weights>
+
+<Candidate-planes>D:\\Projects\\ComprehensiveAlg-TVCG\\Release\\candidate-planes.xyz</Candidate-planes>
