@@ -3,7 +3,6 @@
 #include <igl/per_vertex_normals.h>
 #include <igl/per_face_normals.h>
 #include <igl/read_triangle_mesh.h>
-#include <igl/embree/ambient_occlusion.h>
 #include <igl/viewer/Viewer.h>
 #include <igl/viewer/ViewerPlugin.h>
 #include <igl/jet.h>
@@ -117,22 +116,6 @@ bool key_down(igl::viewer::Viewer& viewer, unsigned char key, int modifier)
 		std::min(std::max(viewer.core.lighting_factor, 0.f), 1.f);
 
 	return false;
-}
-
-
-void someOpt(igl::viewer::Viewer &viewer) {
-
-	// Load a mesh in OFF format
-	meshProcessing::normalizeMesh(F, V);
-
-	Eigen::MatrixXd N;
-	igl::per_vertex_normals(V, F, N);
-
-	// Compute ambient occlusion factor using embree
-	igl::embree::ambient_occlusion(V, F, V, N, 500, AO);
-	AO = 1.0 - AO.array();
-
-	return;
 }
 
 
