@@ -3,6 +3,7 @@
 #include <igl/per_vertex_normals.h>
 #include <igl/per_face_normals.h>
 #include <igl/read_triangle_mesh.h>
+#include <igl/readTGF.h>
 #include <igl/viewer/Viewer.h>
 #include <igl/viewer/ViewerPlugin.h>
 #include <igl/jet.h>
@@ -20,10 +21,11 @@
 
 #include "qJet.h"
 #include "interactiveSelection.h"
+#include "skeletonization.h"
 
 // Mesh
-Eigen::MatrixXd V;
-Eigen::MatrixXi F;
+Eigen::MatrixXd V,Skel_C;
+Eigen::MatrixXi F, Skel_E;
 Eigen::VectorXd AO;
 Eigen::Vector3d vecZDir;
 
@@ -127,7 +129,7 @@ int main(int argc, char *argv[])
 
 	// load external setting file
 	tinyxml2::XMLDocument doc;
-	if (!doc.LoadFile("settings.xml") == tinyxml2::XML_SUCCESS) {
+	if (doc.LoadFile("settings.xml") != tinyxml2::XML_SUCCESS) {
 		std::cout << "Couldn't open settings.xml, will automatically exit." << std::endl;
 		return -1;
 	};
@@ -239,7 +241,7 @@ int main(int argc, char *argv[])
 
 			for (unsigned i = 0; i < NRisky.rows(); ++i) {
 				if (NRisky(i) + 0.707 < 0) {
-					auto &VRisky = viewer.data.F.row(i);
+					const auto &VRisky = viewer.data.F.row(i);
 					for (unsigned j = 0; j < VRisky.cols(); ++j) {
 						C.row(VRisky[j]) = Eigen::RowVector3d(1.0, 0, 0);
 					}
@@ -327,9 +329,20 @@ int main(int argc, char *argv[])
 	};
 	//viewer.callback_key_down = &key_down;
 	//key_down(viewer, '2', 0);
+	
+  	igl::readOFF("../data/161.off", V, F);
+	skeleton::skeletonization("../data/161.off", "../data/skel.tgf");
+
+	igl::readTGF("../data/skel.tgf", Skel_C, Skel_E);
+	viewer.data.set_mesh(V, F);
+	viewer.data.set_edges(Skel_C, Skel_E, Eigen::RowVector3d(90./255.,200./255.,150./255.));
 	viewer.core.background_color = Eigen::Vector4f(0.42f, 0.43f, 1.0f, 1.0f);
 	viewer.core.show_lines = false;
 	viewer.core.lighting_factor = 0.6f;
-	
+	viewer.core.show_overlay_depth = false;
+	viewer.core.line_width = 1;
+	//viewer.callback_key_down = &key_down;
+	//viewer.core.is_animating = false;
+	//viewer.core.animation_max_fps = 30.;
 	viewer.launch();
 }
