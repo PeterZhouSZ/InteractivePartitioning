@@ -1,6 +1,6 @@
 ## Interactive Mesh Partitioning Project
 
-In this project, we mainly focus on how to parition 3D mesh into sub-parts incorporating user's intention well. This project basically depends on a well-known open sourced graphics library [LIBIGL](http://www.github.io/libigl/libigl).
+In this project, we mainly focus on how to parition 3D mesh into sub-parts incorporating user's intention well. This project basically depends on a well-known open sourced graphics library [LIBIGL](http://libigl.github.io).
 
 
 According to the plan, we should work on the following technical details:

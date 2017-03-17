@@ -9,6 +9,7 @@
 #include <igl/jet.h>
 #include <igl/barycenter.h>
 #include <igl/unproject_onto_mesh.h>
+#include <igl/readOFF.h>
 
 #include <nanogui/formhelper.h>
 #include <nanogui/screen.h>

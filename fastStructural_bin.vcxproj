@@ -144,7 +144,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IGL_STATIC_LIBRARY;IGL_VIEWER_WITH_NANOGUI;INCLUDE_TEMPLATES;ENABLE_STATIC_LIB;IGL_NO_MOSEK;CGAL_USE_MPFR;CGAL_USE_GMP;BOOST_ALL_DYN_LINK;TUTORIAL_SHARED_PATH="D:/libigl/tutorial/shared";CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;IGL_STATIC_LIBRARY;IGL_VIEWER_WITH_NANOGUI;INCLUDE_TEMPLATES;ENABLE_STATIC_LIB;IGL_NO_MOSEK;CGAL_USE_MPFR;CGAL_USE_GMP;BOOST_ALL_DYN_LINK;CGAL_EIGEN3_ENABLED;TUTORIAL_SHARED_PATH="D:/libigl/tutorial/shared";CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
@@ -273,10 +273,12 @@
     <ClCompile Include="interactiveSelection.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="qJet.cpp" />
+    <ClCompile Include="skeletonization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="interactiveSelection.h" />
     <ClInclude Include="qJet.h" />
+    <ClInclude Include="skeletonization.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
